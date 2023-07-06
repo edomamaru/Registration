@@ -1,5 +1,5 @@
-from flask import Flask, render_template, url_for, flash, redirect
-from forms import RegistrationForm
+import git
+from flask import Flask, render_template, url_for, flash, redirect, requestfrom forms import RegistrationForm
 from flask_behind_proxy import FlaskBehindProxy
 
 app = Flask(__name__)
@@ -9,6 +9,16 @@ proxied = FlaskBehindProxy(app)
 @app.route("/")
 def hello_world():
     return render_template('home.html', subtitle='Home Page', text='This is the home page')
+
+@app.route("/update_server", methods=['POST'])
+def webhook():
+    if request.method == 'POST':
+        repo = git.Repo('/home/Registation/Registration')
+        origin = repo.remotes.origin
+        origin.pull()
+        return 'Updated PythonAnywhere successfully', 200
+    else:
+        return 'Wrong event type', 400
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
